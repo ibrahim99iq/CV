@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farfasha Modern</title>
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+
+body{
+height:100vh;
+background:#0a0a0f;
+overflow:hidden;
+color:white;
+}
+
+/* خلفية */
+canvas{
+position:fixed;
+z-index:-1;
+}
+
+/* الكارد */
+.container{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(15px);
+padding:40px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 0 40px rgba(0,255,255,.2);
+}
+
+/* عنوان */
+h1{
+margin-bottom:15px;
+font-size:38px;
+text-shadow:0 0 15px cyan;
+}
+
+/* زر */
+.btn{
+padding:12px 30px;
+background:linear-gradient(45deg,cyan,magenta);
+border:none;
+color:white;
+font-size:18px;
+border-radius:12px;
+cursor:pointer;
+transition:.3s;
+margin-top:10px;
+}
+
+.btn:hover{
+transform:scale(1.1);
+box-shadow:0 0 20px cyan;
+}
+
+/* لعبة */
+#target{
+width:80px;
+height:80px;
+border-radius:50%;
+background:radial-gradient(circle,cyan,blue);
+position:absolute;
+display:none;
+cursor:pointer;
+box-shadow:0 0 30px cyan;
+}
+
+#score,#timer{
+margin-top:10px;
+font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+<h1>🔥 موقع الفرفشة</h1>
+<div id="score">Score: 0</div>
+<div id="timer">Time: 20</div>
+<button class="btn" onclick="startGame()">Start</button>
+</div>
+
+<div id="target"></div>
+
+<script>
+
+/* خلفية متحركة */
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let particles=[];
+for(let i=0;i<120;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+dx:(Math.random()-.5),
+dy:(Math.random()-.5)
+});
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(p=>{
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fillStyle="cyan";
+ctx.fill();
+
+p.x+=p.dx;
+p.y+=p.dy;
+
+if(p.x<0||p.x>canvas.width) p.dx*=-1;
+if(p.y<0||p.y>canvas.height) p.dy*=-1;
+});
+
+requestAnimationFrame(animate);
+}
+animate();
+
+/* لعبة */
+let score=0;
+let time=20;
+let gameInterval;
+let target=document.getElementById("target");
+
+function startGame(){
+score=0;
+time=20;
+target.style.display="block";
+
+document.getElementById("score").innerText="Score: "+score;
+document.getElementById("timer").innerText="Time: "+time;
+
+moveTarget();
+
+gameInterval=setInterval(()=>{
+time--;
+document.getElementById("timer").innerText="Time: "+time;
+if(time<=0){
+clearInterval(gameInterval);
+target.style.display="none";
+alert("خلص الوقت 😎 نتيجتك: "+score);
+}
+},1000);
+}
+
+function moveTarget(){
+let x=Math.random()*(window.innerWidth-100);
+let y=Math.random()*(window.innerHeight-100);
+target.style.left=x+"px";
+target.style.top=y+"px";
+}
+
+target.onclick=function(){
+score++;
+document.getElementById("score").innerText="Score: "+score;
+moveTarget();
+}
+
+</script>
+
+</body>
+</html>
